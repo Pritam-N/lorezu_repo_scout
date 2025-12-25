@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "next_id": 2,
+  "tasks": [
+    {
+      "id": 1,
+      "text": "init and setup",
+      "done": false,
+      "created_at": "2025-12-25T19:29:20+00:00",
+      "done_at": "",
+      "priority": "",
+      "due": "",
+      "tags": []
+    }
+  ]
+}

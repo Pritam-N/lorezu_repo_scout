@@ -1,0 +1,136 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://secret-scout.dev/schemas/rules.schema.json",
+    "title": "secret-scout rule pack",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["metadata", "rules"],
+    "properties": {
+      "metadata": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "version"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "version": { "type": "string", "minLength": 1 },
+          "source": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      },
+      "rules": {
+        "type": "array",
+        "items": { "$ref": "#/$defs/rule" }
+      }
+    },
+    "$defs": {
+      "severity": {
+        "type": "string",
+        "enum": ["low", "medium", "high", "critical"]
+      },
+      "ruleType": {
+        "type": "string",
+        "enum": ["filename", "regex", "structured"]
+      },
+      "matchScope": {
+        "type": "string",
+        "enum": ["line", "file"]
+      },
+      "structuredFormat": {
+        "type": "string",
+        "enum": ["dotenv", "yaml", "json", "toml", "ini"]
+      },
+      "valuePolicy": {
+        "type": "string",
+        "enum": ["any", "non_empty", "plaintext", "must_reference_env", "must_reference_vault"]
+      },
+      "filenameConfig": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["pattern"],
+        "properties": {
+          "pattern": { "type": "string", "minLength": 1 },
+          "pattern_type": { "type": "string", "enum": ["regex", "glob"], "default": "regex" }
+        }
+      },
+      "regexConfig": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["regex"],
+        "properties": {
+          "regex": { "type": "string", "minLength": 1 },
+          "scope": { "$ref": "#/$defs/matchScope", "default": "line" },
+          "max_matches": { "type": "integer", "minimum": 1, "maximum": 100, "default": 3 },
+          "multiline": { "type": "boolean", "default": false }
+        }
+      },
+      "structuredConfig": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["format"],
+        "properties": {
+          "format": { "$ref": "#/$defs/structuredFormat" },
+          "forbidden_keys": { "type": "array", "items": { "type": "string" }, "default": [] },
+          "allowed_keys": { "type": "array", "items": { "type": "string" }, "default": [] },
+          "key_prefixes": { "type": "array", "items": { "type": "string" }, "default": [] },
+          "value_policy": { "$ref": "#/$defs/valuePolicy", "default": "any" },
+          "case_insensitive_keys": { "type": "boolean", "default": true }
+        }
+      },
+      "ruleCommon": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "type"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 200,
+            "pattern": "^[^\\s]+$"
+          },
+          "type": { "$ref": "#/$defs/ruleType" },
+          "severity": { "$ref": "#/$defs/severity", "default": "medium" },
+          "description": { "type": "string", "default": "" },
+          "tags": { "type": "array", "items": { "type": "string" }, "default": [] },
+  
+          "include": { "type": "array", "items": { "type": "string" }, "default": [] },
+          "exclude": { "type": "array", "items": { "type": "string" }, "default": [] },
+  
+          "allow_paths": { "type": "array", "items": { "type": "string" }, "default": [] },
+          "allow_regexes": { "type": "array", "items": { "type": "string" }, "default": [] },
+  
+          "enabled": { "type": "boolean", "default": true },
+  
+          "filename": { "$ref": "#/$defs/filenameConfig" },
+          "regex": { "$ref": "#/$defs/regexConfig" },
+          "structured": { "$ref": "#/$defs/structuredConfig" }
+        }
+      },
+      "rule": {
+        "allOf": [
+          { "$ref": "#/$defs/ruleCommon" },
+          {
+            "oneOf": [
+              {
+                "title": "Filename rule",
+                "properties": { "type": { "const": "filename" } },
+                "required": ["filename"],
+                "not": { "anyOf": [{ "required": ["regex"] }, { "required": ["structured"] }] }
+              },
+              {
+                "title": "Regex rule",
+                "properties": { "type": { "const": "regex" } },
+                "required": ["regex"],
+                "not": { "anyOf": [{ "required": ["filename"] }, { "required": ["structured"] }] }
+              },
+              {
+                "title": "Structured rule",
+                "properties": { "type": { "const": "structured" } },
+                "required": ["structured"],
+                "not": { "anyOf": [{ "required": ["filename"] }, { "required": ["regex"] }] }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }

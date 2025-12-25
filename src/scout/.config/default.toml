@@ -1,0 +1,10 @@
+[scan]
+max_file_bytes = 2000000
+redact = true
+include_ignored = false
+deterministic = true
+
+skip_dirs = [
+  ".git", ".venv", "venv", "node_modules", "dist", "build",
+  ".tox", ".mypy_cache", ".pytest_cache", ".ruff_cache"
+]

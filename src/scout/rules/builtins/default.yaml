@@ -1,0 +1,112 @@
+metadata:
+  name: "default"
+  version: "1"
+  description: "Baseline rules for preventing accidental secret/config leakage."
+
+rules:
+  # ------------------------
+  # Suspicious filenames
+  # ------------------------
+  - id: "filename.env-files"
+    type: "filename"
+    severity: "high"
+    description: "Detect .env and similar env/config files that commonly contain secrets."
+    tags: ["env", "filename"]
+    filename:
+      pattern_type: "regex"
+      pattern: "(^|/)\\.env($|\\.)|(^|/).*\\.env$|(^|/)env\\..+"
+    allow_paths:
+      - "**/.env.example"
+      - "**/.env.template"
+      - "**/.env.sample"
+      - "**/.env.dist"
+      - "**/.env.*.example"
+
+  - id: "filename.private-keys"
+    type: "filename"
+    severity: "critical"
+    description: "Detect private key material by filename."
+    tags: ["key", "private-key", "filename"]
+    filename:
+      pattern_type: "regex"
+      pattern: "(^|/)(id_rsa|id_dsa)$|\\.pem$|\\.key$|\\.p8$|\\.p12$|\\.pfx$|\\.jks$|\\.jceks$"
+
+  - id: "filename.secrets-folders"
+    type: "filename"
+    severity: "high"
+    description: "Detect folders/files named secrets/credentials."
+    tags: ["secrets", "filename"]
+    filename:
+      pattern_type: "regex"
+      pattern: "(^|/)(secrets?|credentials?)(/|\\.|$)"
+
+  # ------------------------
+  # Content regex rules
+  # ------------------------
+  - id: "regex.private-key-block"
+    type: "regex"
+    severity: "critical"
+    description: "Detect PEM/SSH private key blocks."
+    tags: ["private-key", "content"]
+    regex:
+      regex: "-----BEGIN (RSA|DSA|EC|OPENSSH|PGP) PRIVATE KEY-----"
+      scope: "file"
+      multiline: true
+      max_matches: 1
+
+  - id: "regex.aws-access-key-id"
+    type: "regex"
+    severity: "high"
+    description: "Detect AWS Access Key ID patterns."
+    tags: ["aws", "content"]
+    regex:
+      regex: "\\bAKIA[0-9A-Z]{16}\\b"
+      scope: "line"
+      max_matches: 3
+
+  - id: "regex.github-tokens"
+    type: "regex"
+    severity: "high"
+    description: "Detect GitHub tokens (heuristic)."
+    tags: ["github", "token", "content"]
+    regex:
+      regex: "\\b(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36,}\\b"
+      scope: "line"
+      max_matches: 3
+
+  - id: "regex.generic-secret-assignments"
+    type: "regex"
+    severity: "medium"
+    description: "Detect common KEY=VALUE secret assignments (heuristic; tune allowlists as needed)."
+    tags: ["generic", "content"]
+    regex:
+      regex: "\\b(api[_-]?key|secret|token|password|passwd|pwd)\\b\\s*[:=]\\s*['\\\"]?[A-Za-z0-9_\\-\\/+=]{12,}['\\\"]?"
+      scope: "line"
+      max_matches: 5
+
+  # ------------------------
+  # Structured dotenv rules (requires dotenv parser later)
+  # ------------------------
+  - id: "dotenv.forbidden-secret-keys"
+    type: "structured"
+    severity: "high"
+    description: "Detect common secret keys in dotenv-like files."
+    tags: ["dotenv", "structured"]
+    include:
+      - "**/.env"
+      - "**/.env.*"
+      - "**/*.env"
+      - "**/env.*"
+    structured:
+      format: "dotenv"
+      value_policy: "non_empty"
+      forbidden_keys:
+        - "AWS_SECRET_ACCESS_KEY"
+        - "AWS_ACCESS_KEY_ID"
+        - "GITHUB_TOKEN"
+        - "OPENAI_API_KEY"
+        - "ANTHROPIC_API_KEY"
+        - "GOOGLE_API_KEY"
+        - "AZURE_CLIENT_SECRET"
+        - "DATABASE_URL"
+        - "SUPABASE_SERVICE_ROLE_KEY"
