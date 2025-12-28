@@ -231,22 +231,12 @@ class ResultsTUI(App):
     # Reactive attribute for search - triggers watcher when changed
     search_query = reactive("")
 
+    # Minimal, reliable bindings (priority=False so focused inputs get keys first)
     BINDINGS = [
-        Binding("q", "quit", "Quit", show=True, priority=False),
         Binding("/", "focus_search", "Search", show=True, priority=False),
-        Binding("escape", "clear_search", "Clear search", show=True, priority=False),
-        Binding("o", "open_selected", "Open in editor", show=True, priority=False),
-        Binding(
-            "enter",
-            "open_selected",
-            "Open (when not typing)",
-            show=False,
-            priority=False,
-        ),
-        Binding("tab", "focus_next", "Next focus", show=False, priority=False),
-        Binding(
-            "shift+tab", "focus_previous", "Prev focus", show=False, priority=False
-        ),
+        Binding("escape", "clear_search", "Clear", show=True, priority=False),
+        Binding("o", "open_selected", "Open", show=True, priority=False),
+        Binding("q", "quit", "Quit", show=True, priority=False),
     ]
 
     def __init__(self, data: TUIData, **kwargs):
@@ -374,6 +364,14 @@ class ResultsTUI(App):
             return True
         blob = " ".join([p for p in parts if p]).lower()
         return self.search_query in blob
+
+    # Ensure Esc always clears search, even if Textual swallows the binding.
+    def on_key(self, event) -> None:
+        if event.key == "escape":
+            self.action_clear_search()
+            event.stop()
+            return
+        super().on_key(event)
 
     # ----------------------------
     # Setup tables
