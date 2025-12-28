@@ -2,85 +2,130 @@
 
 ## Commands
 
-### `secret-scout init`
+### `scout init repo`
 
-Initialize secret-scout configuration in a repository.
+Initialize scout configuration in a repository.
 
 ```bash
-secret-scout init [DIRECTORY] [OPTIONS]
+scout init repo [PATH] [OPTIONS]
 ```
 
 **Arguments:**
 
 | Argument | Description | Default |
 |----------|-------------|---------|
-| `DIRECTORY` | Target directory (repo root) | `.` |
+| `PATH` | Target directory (repo root) | `.` |
 
 **Options:**
 
 | Option | Description |
 |--------|-------------|
 | `--force` | Overwrite existing files |
-| `--strict` | Generate stricter starter rules template |
-| `--no-gitignore` | Don't create `.secret-scout/.gitignore` |
-| `--no-readme` | Don't create `.secret-scout/README.md` |
 
 ---
 
-### `secret-scout scan`
+### `scout scan path`
 
 Scan a local directory for secrets.
 
 ```bash
-secret-scout scan [PATH] [OPTIONS]
-secret-scout scan --path PATH [OPTIONS]
+scout scan path [PATH] [OPTIONS]
 ```
 
 **Arguments:**
 
 | Argument | Description | Default |
 |----------|-------------|---------|
-| `PATH` | Directory to scan (positional) | `.` (current directory) |
+| `PATH` | Directory to scan | `.` (current directory) |
 
 **Options:**
 
 | Option | Description |
 |--------|-------------|
-| `--path`, `-p` | Directory to scan (alternative to positional arg) |
 | `--verbose` | Show detailed output |
-| `--fail / --no-fail` | Exit with non-zero code if findings exist (default: true) |
+| `--fail / --no-fail` | Exit with non-zero code if findings exist (default: `--fail`) |
 | `--plain` | Disable TUI; print Rich output (CI-friendly) |
-| `--builtin` | Built-in rule pack to use (default: `default`) |
-| `--rules` | Additional rules file(s) to load (repeatable) |
-| `--ignore` | Glob patterns to ignore (repeatable) |
-| `--include-ignored / --no-include-ignored` | Include git-ignored files |
+| `--builtin NAME` | Built-in rule pack to use: `default` or `strict` (default: `default`) |
+| `--rules FILE` | Additional rules file(s) to load (repeatable) |
+| `--ignore GLOB` | Glob patterns to ignore (repeatable) |
+| `--include-ignored / --no-include-ignored` | Include git-ignored files (overrides config) |
 | `--include-untracked / --no-include-untracked` | Include untracked files (default: true) |
 | `--ignore-errors` | Continue on file read errors |
 
 ---
 
-### `secret-scout github`
+### `scout github`
 
 Scan GitHub repositories for secrets.
 
 ```bash
-secret-scout github [OPTIONS]
+scout github [OPTIONS]
 ```
+
+**Required Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--org ORG` | GitHub organization to scan (required if `--user` not provided) |
+| `--user USER` | GitHub user to scan (required if `--org` not provided) |
 
 **Options:**
 
 | Option | Description |
 |--------|-------------|
-| `--org` | GitHub organization to scan |
-| `--user` | GitHub user to scan |
-| `--token` | GitHub personal access token (or set `GITHUB_TOKEN`) |
-| `--include` | Regex pattern to include repos |
-| `--exclude` | Regex pattern to exclude repos |
-| `--archived` | Include archived repos |
-| `--forks` | Include forked repos |
-| `--private` | Include private repos |
-| `--verbose` | Show detailed output |
-| `--fail` | Exit with non-zero code if findings exist |
+| `--token TOKEN` | GitHub personal access token (or set `GITHUB_TOKEN` env var) |
+| `--include GLOB` | Glob pattern to include repos by full_name (repeatable) |
+| `--exclude GLOB` | Glob pattern to exclude repos by full_name (repeatable) |
+| `--repo REPO` | Explicit repo allowlist, format: `org/repo` (repeatable) |
+| `--include-archived` | Include archived repos (default: false) |
+| `--include-forks` | Include forked repos (default: false) |
+| `--include-private / --no-include-private` | Include private repos (default: true) |
+| `--max-repos N` | Limit number of repos to scan |
+| `--concurrency N` | Number of parallel workers (1-32, default: 4) |
+| `--shallow / --no-shallow` | Use shallow clones (default: true) |
+| `--blobless / --no-blobless` | Use blobless clones (default: true) |
+| `--tmp-dir PATH` | Custom workspace directory (default: temp dir) |
+| `--keep-clones` | Don't delete workspace after scanning |
+| `--ignore GLOB` | Ignore paths within repos (repeatable) |
+| `--builtin NAME` | Builtin rule pack (default: `default`) |
+| `--rules FILE` | Extra rule files (repeatable) |
+| `--plain` | Disable TUI (CI-friendly) |
+| `--fail / --no-fail` | Exit 1 on findings (default: `--fail`) |
+| `--ignore-errors` | Don't exit on repo errors |
+| `--verbose` | Show scan summary |
+
+---
+
+### `scout rules validate`
+
+Validate rule files.
+
+```bash
+scout rules validate [PATH] [OPTIONS]
+```
+
+**Arguments:**
+
+| Argument | Description | Default |
+|----------|-------------|---------|
+| `PATH` | Path to resolve repo/global rules from | `.` |
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--builtin NAME` | Builtin pack to use (default: `default`) |
+| `--rules FILE` | Extra rule packs (repeatable) |
+
+---
+
+### `scout baseline gen`
+
+Generate baseline from current findings (coming soon).
+
+```bash
+scout baseline gen
+```
 
 ---
 
@@ -99,5 +144,5 @@ secret-scout github [OPTIONS]
 | Variable | Description |
 |----------|-------------|
 | `GITHUB_TOKEN` | GitHub personal access token for API access |
-| `SECRET_SCOUT_CONFIG` | Path to global config file |
+| `SCOUT_EDITOR`, `VISUAL`, `EDITOR` | Preferred editor for opening findings (first match wins) |
 

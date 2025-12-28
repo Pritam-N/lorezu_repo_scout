@@ -12,7 +12,7 @@ class ExitCode(IntEnum):
 
 class SecretScoutError(Exception):
     """
-    Base exception for all secret-scout errors.
+    Base exception for all repo-scout errors.
     Attach an exit code and safe message.
     """
 

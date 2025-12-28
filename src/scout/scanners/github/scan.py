@@ -50,7 +50,7 @@ def _scan_one_repo(
     clone_ms: int,
     on_event: Optional[OnEvent],
 ) -> ScanResult:
-    # load config + rules per repo (supports .secret-scout in each repo)
+    # load config + rules per repo (supports .repo-scout in each repo)
     loaded_cfg = load_scan_config(repo_path, cli_overrides={"scan": {}})
     loaded_rules = load_ruleset(repo_path, builtin=builtin, extra_rule_files=rules_files)
 
@@ -135,7 +135,7 @@ def scan_github(
         workspace.mkdir(parents=True, exist_ok=True)
         temp_ctx = None
     else:
-        temp_ctx = tempfile.TemporaryDirectory(prefix="secret-scout-gh-")
+        temp_ctx = tempfile.TemporaryDirectory(prefix="repo-scout-gh-")
         workspace = Path(temp_ctx.name).resolve()
 
     clones_root = workspace / "clones"

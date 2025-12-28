@@ -1,4 +1,4 @@
-secret-scout/
+repo-scout/
   pyproject.toml
   README.md
   LICENSE

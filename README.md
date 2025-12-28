@@ -1,4 +1,4 @@
-# Secret Scout
+# Repo Scout
 
 > Prevent accidental secret leaks by scanning repos for risky files and patterns.
 
@@ -19,16 +19,16 @@
 ### Installation
 
 ```bash
-pip install secret-scout
+pip install repo-scout
 ```
 
 ### Initialize a project
 
 ```bash
-secret-scout init
+scout init repo
 ```
 
-Creates `.secret-scout/` with:
+Creates `.repo-scout/` with:
 - `config.toml` - scan behavior settings
 - `rules.yaml` - repo-specific rule overrides
 
@@ -36,26 +36,77 @@ Creates `.secret-scout/` with:
 
 ```bash
 # Scan current directory
-secret-scout scan .
+scout scan path .
 
-# Using --path option
-secret-scout scan --path .
+# Scan with verbose output
+scout scan path . --verbose
 
-# Verbose output
-secret-scout scan . --verbose
+# Include gitignored files
+scout scan path . --include-ignored
 
-# Fail on findings (for CI)
-secret-scout scan . --fail
+# Exclude untracked files
+scout scan path . --no-include-untracked
+
+# Use custom rules file
+scout scan path . --rules custom-rules.yaml
+
+# Use strict builtin rules
+scout scan path . --builtin strict
+
+# Ignore specific paths
+scout scan path . --ignore "**/vendor/**" --ignore "**/node_modules/**"
+
+# Disable TUI (for CI)
+scout scan path . --plain
+
+# Don't fail on findings (for testing)
+scout scan path . --no-fail
+
+# Ignore errors
+scout scan path . --ignore-errors
 ```
 
 ### Scan GitHub repos
 
 ```bash
 # Scan all repos in an org
-secret-scout github --org my-org --token $GITHUB_TOKEN
+scout github --org my-org --token $GITHUB_TOKEN
 
 # Scan a user's repos
-secret-scout github --user octocat --token $GITHUB_TOKEN
+scout github --user octocat --token $GITHUB_TOKEN
+
+# Include private repos
+scout github --org my-org --include-private --token $GITHUB_TOKEN
+
+# Include archived repos
+scout github --org my-org --include-archived --token $GITHUB_TOKEN
+
+# Include forks
+scout github --org my-org --include-forks --token $GITHUB_TOKEN
+
+# Filter repos by name
+scout github --org my-org --include "my-org/important-*" --exclude "my-org/deprecated-*" --token $GITHUB_TOKEN
+
+# Scan specific repos
+scout github --org my-org --repo my-org/repo1 --repo my-org/repo2 --token $GITHUB_TOKEN
+
+# Limit number of repos
+scout github --org my-org --max-repos 10 --token $GITHUB_TOKEN
+
+# Adjust concurrency
+scout github --org my-org --concurrency 8 --token $GITHUB_TOKEN
+
+# Use custom workspace directory
+scout github --org my-org --tmp-dir /tmp/scout-workspace --token $GITHUB_TOKEN
+
+# Keep clones after scanning (for debugging)
+scout github --org my-org --keep-clones --token $GITHUB_TOKEN
+
+# Disable shallow clones
+scout github --org my-org --no-shallow --token $GITHUB_TOKEN
+
+# Disable blobless clones
+scout github --org my-org --no-blobless --token $GITHUB_TOKEN
 ```
 
 ---
@@ -93,8 +144,8 @@ The heart of the tool. Rules act as a policy engine.
 
 - **Built-in pack**: `default` (safe baseline)
 - **User packs** loaded from:
-  - Repo config: `.secret-scout/`
-  - Global config: `~/.config/secret-scout/`
+  - Repo config: `.repo-scout/`
+  - Global config: `~/.config/repo-scout/` or `~/.repo-scout/`
 - **Formats**:
   - `rules.yaml` (non-dev friendly)
   - Optional Python plugin packs (enterprise teams)
@@ -123,14 +174,13 @@ Redaction is **on by default**. Use `--no-redact` only for local debugging.
 For real-world adoption:
 
 ```bash
-# Capture current findings
-secret-scout baseline create
-
-# Suppress known findings
-secret-scout baseline apply
+# Generate baseline (coming soon)
+scout baseline gen
 ```
 
 **"New findings only"** mode for CI: blocks only regressions while teams clean up gradually.
+
+> **Note**: Baseline functionality is currently under development.
 
 ### 5. Performance + Safety
 
@@ -142,21 +192,71 @@ secret-scout baseline apply
 
 ### 6. Commands
 
+#### Core Commands
+
 | Command | Description |
 |---------|-------------|
-| `secret-scout init` | Generate `.secret-scout/config.toml` + starter rule pack + ignore file |
-| `secret-scout scan [PATH]` | Scan local path. Options: `--path`, `--include-ignored`, `--format`, `--fail` |
-| `secret-scout scan github` | Scan GitHub org/user. Options: filters, `--workers`, `--keep-temp`, `--format`, `--fail` |
-| `secret-scout rules list\|show\|validate\|test` | Manage and test rules |
-| `secret-scout baseline create\|apply` | Manage baselines |
-| `secret-scout config validate\|print` | Validate and inspect configuration |
+| `scout --version` | Show version and exit |
+| `scout --help` | Show help message |
+| `scout init repo [PATH]` | Initialize scout configuration in a repository. Creates `.repo-scout/` directory with config files. Use `--force` to overwrite existing files. |
+| `scout scan path [PATH]` | Scan a local directory or repository for secrets. Defaults to current directory. |
+| `scout github` | Scan GitHub organization or user repositories. Requires `--org` or `--user` option. |
+
+#### Rules Commands
+
+| Command | Description |
+|---------|-------------|
+| `scout rules validate [PATH]` | Validate rule files. Checks syntax and loads rules from repo/global config. Use `--builtin` to specify builtin pack (default/strict). Use `--rules` to add extra rule files. |
+
+#### Baseline Commands
+
+| Command | Description |
+|---------|-------------|
+| `scout baseline gen` | Generate baseline from current findings (coming soon). |
+
+#### Common Options
+
+**Scan Path Options:**
+- `--fail/--no-fail` - Exit with code 1 if findings are present (default: `--fail`)
+- `--include-ignored/--no-include-ignored` - Include gitignored files
+- `--include-untracked/--no-include-untracked` - Include untracked files (default: true)
+- `--ignore GLOB` - Ignore paths matching glob pattern (repeatable)
+- `--rules FILE` - Load additional rule file (repeatable)
+- `--builtin NAME` - Builtin rule pack: `default` or `strict` (default: `default`)
+- `--verbose` - Show verbose output
+- `--plain` - Disable TUI, use plain Rich output (CI-friendly)
+- `--ignore-errors` - Don't exit on file errors
+
+**GitHub Scan Options:**
+- `--org ORG` - GitHub organization to scan
+- `--user USER` - GitHub username to scan
+- `--token TOKEN` - GitHub API token (or set `GITHUB_TOKEN` env var)
+- `--include GLOB` - Include repos matching glob (repeatable)
+- `--exclude GLOB` - Exclude repos matching glob (repeatable)
+- `--repo REPO` - Explicit repo allowlist, format: `org/repo` (repeatable)
+- `--include-private/--no-include-private` - Include private repos (default: true)
+- `--include-archived` - Include archived repos (default: false)
+- `--include-forks` - Include forked repos (default: false)
+- `--max-repos N` - Limit number of repos to scan
+- `--concurrency N` - Number of parallel workers (1-32, default: 4)
+- `--shallow/--no-shallow` - Use shallow clones (default: true)
+- `--blobless/--no-blobless` - Use blobless clones (default: true)
+- `--tmp-dir PATH` - Custom workspace directory (default: temp dir)
+- `--keep-clones` - Don't delete workspace after scanning
+- `--ignore GLOB` - Ignore paths within repos (repeatable)
+- `--builtin NAME` - Builtin rule pack (default: `default`)
+- `--rules FILE` - Extra rule files (repeatable)
+- `--plain` - Disable TUI (CI-friendly)
+- `--fail/--no-fail` - Exit 1 on findings (default: `--fail`)
+- `--ignore-errors` - Don't exit on repo errors
+- `--verbose` - Show scan summary
 
 ---
 
 ## Project Structure
 
 ```
-secret-scout/
+repo-scout/
 ├── pyproject.toml
 ├── README.md
 ├── LICENSE

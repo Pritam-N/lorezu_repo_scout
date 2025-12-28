@@ -15,14 +15,14 @@ except ModuleNotFoundError:  # pragma: no cover
 
 # Repo-local config (checked into the repo being scanned)
 DEFAULT_REPO_CONFIG_FILES = (
-    ".secret-scout/config.toml",
-    ".secret-scout/config.toml.example",  # optional convention
+    ".repo-scout/config.toml",
+    ".repo-scout/config.toml.example",  # optional convention
 )
 
 # Global config (applies on this machine for all scans)
 DEFAULT_GLOBAL_CONFIG_FILES = (
-    "~/.config/secret-scout/config.toml",
-    "~/.secret-scout/config.toml",
+    "~/.config/repo-scout/config.toml",
+    "~/.repo-scout/config.toml",
 )
 
 

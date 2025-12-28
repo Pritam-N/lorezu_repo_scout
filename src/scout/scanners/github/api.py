@@ -62,7 +62,7 @@ class GitHubClient:
         self,
         token: Optional[str] = None,
         api_base: str = "https://api.github.com",
-        user_agent: str = "secret-scout",
+        user_agent: str = "repo-scout",
         timeout_s: int = 30,
     ) -> None:
         self.token = token or os.environ.get("GITHUB_TOKEN")

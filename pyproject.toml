@@ -1,8 +1,39 @@
 [project]
 name = "repo-scout"
 version = "0.1.0"
+description = "Prevent accidental secret leaks by scanning repos for risky files and patterns"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Pritama Kumar Nayak"}
+]
+keywords = [
+    "security",
+    "secrets",
+    "scanning",
+    "github",
+    "git",
+    "secrets-detection",
+    "security-audit",
+    "ci-cd",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Utilities",
+]
 dependencies = [
-    "typer[all]>=0.12.0",
+    "typer>=0.12.0",
     "pydantic-settings>=2.0.0",  # Good for CLI config management
     "pyyaml>=6.0.0",             # For config files
     "rich>=13.0.0",              # For pretty output
@@ -11,7 +42,12 @@ dependencies = [
     "httpx>=0.27.0",             # For GitHub API
     "textual>=6.11.0",           # For TUI output
 ]
-requires-python = ">=3.9"
+
+[project.urls]
+Homepage = "https://github.com/Pritam-N/lorezu_repo_scout"  # TODO: Update with actual URL
+Documentation = "https://github.com/Pritam-N/lorezu_repo_scout"  # TODO: Update with actual URL
+Repository = "https://github.com/Pritam-N/lorezu_repo_scout"  # TODO: Update with actual URL
+Issues = "https://github.com/Pritam-N/lorezu_repo_scout/issues"  # TODO: Update with actual URL
 
 [project.optional-dependencies]
 schema = ["jsonschema>=4.21.0"]

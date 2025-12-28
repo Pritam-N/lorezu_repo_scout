@@ -1,6 +1,6 @@
-site_name: Secret Scout
+site_name: Lorezu Repo Scout
 site_description: Prevent accidental secret leaks by scanning repos for risky files and patterns.
-site_url: https://secret-scout.dev
+site_url: https://github.com/Pritam-N/lorezu_repo_scout
 
 theme:
   name: material

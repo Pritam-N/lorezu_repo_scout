@@ -1,4 +1,4 @@
-# Secret Scout
+# Repo Scout
 
 Prevent accidental secret leaks by scanning repos for risky files and patterns.
 
@@ -15,16 +15,16 @@ Prevent accidental secret leaks by scanning repos for risky files and patterns.
 ### Installation
 
 ```bash
-pip install secret-scout
+pip install repo-scout
 ```
 
 ### Initialize a project
 
 ```bash
-secret-scout init
+scout init repo
 ```
 
-This creates `.secret-scout/` with:
+This creates `.repo-scout/` with:
 
 - `config.toml` - scan behavior settings
 - `rules.yaml` - repo-specific rule overrides
@@ -33,31 +33,28 @@ This creates `.secret-scout/` with:
 
 ```bash
 # Scan current directory
-secret-scout scan .
-
-# Using --path option
-secret-scout scan --path .
+scout scan path .
 
 # Scan with verbose output
-secret-scout scan . --verbose
+scout scan path . --verbose
 
 # Fail on findings (for CI)
-secret-scout scan . --fail
+scout scan path . --fail
 ```
 
 ### Scan GitHub repos
 
 ```bash
 # Scan all repos in an org
-secret-scout github --org my-org --token $GITHUB_TOKEN
+scout github --org my-org --token $GITHUB_TOKEN
 
 # Scan a user's repos
-secret-scout github --user octocat --token $GITHUB_TOKEN
+scout github --user octocat --token $GITHUB_TOKEN
 ```
 
 ## Built-in Rules
 
-Secret Scout includes rules for detecting:
+Repo Scout includes rules for detecting:
 
 | Category | Examples |
 |----------|----------|

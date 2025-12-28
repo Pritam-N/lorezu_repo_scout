@@ -55,14 +55,14 @@ rules:
 
 
 DEFAULT_GITIGNORE = """\
-# secret-scout local artifacts
-.secret-scout/.cache/
-.secret-scout/cache/
-.secret-scout/tmp/
+# repo-scout local artifacts
+.repo-scout/.cache/
+.repo-scout/cache/
+.repo-scout/tmp/
 
 # Baselines (optional: commit if you want)
-.secret-scout/baseline.json
-.secret-scout/baseline*.json
+.repo-scout/baseline.json
+.repo-scout/baseline*.json
 """
 
 
@@ -90,7 +90,7 @@ def init_repo(
     force: bool = typer.Option(False, "--force", help="Overwrite existing files."),
 ) -> None:
     root = path.resolve()
-    cfg_dir = root / ".secret-scout"
+    cfg_dir = root / ".repo-scout"
     ensure_dir(cfg_dir)
 
     write_file(cfg_dir / "config.toml", DEFAULT_CONFIG_TOML, force=force)

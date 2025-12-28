@@ -1,15 +1,15 @@
 # Configuration
 
-Secret Scout uses a layered configuration system with the following precedence (lowest to highest):
+Repo Scout uses a layered configuration system with the following precedence (lowest to highest):
 
 1. **Built-in defaults**
-2. **Global config** (`~/.config/secret-scout/`)
-3. **Repo config** (`.secret-scout/`)
+2. **Global config** (`~/.config/repo-scout/` or `~/.repo-scout/`)
+3. **Repo config** (`.repo-scout/`)
 4. **CLI options**
 
 ## Config File
 
-Create `.secret-scout/config.toml` in your repository:
+Create `.repo-scout/config.toml` in your repository:
 
 ```toml
 [scan]
@@ -53,7 +53,7 @@ editors = ["cursor", "code", "subl", "zed", "nvim", "vim"]
 
 ## Rules File
 
-Create `.secret-scout/rules.yaml` to customize or override rules:
+Create `.repo-scout/rules.yaml` to customize or override rules:
 
 ```yaml
 metadata:

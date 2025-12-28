@@ -19,15 +19,15 @@ from importlib import resources as importlib_resources
 
 
 DEFAULT_REPO_RULE_FILES = (
-    ".secret-scout/rules.yaml",
-    ".secret-scout/rules.yml",
+    ".repo-scout/rules.yaml",
+    ".repo-scout/rules.yml",
 )
 
 DEFAULT_GLOBAL_RULE_FILES = (
-    "~/.config/secret-scout/rules.yaml",
-    "~/.config/secret-scout/rules.yml",
-    "~/.secret-scout/rules.yaml",
-    "~/.secret-scout/rules.yml",
+    "~/.config/repo-scout/rules.yaml",
+    "~/.config/repo-scout/rules.yml",
+    "~/.repo-scout/rules.yaml",
+    "~/.repo-scout/rules.yml",
 )
 
 
